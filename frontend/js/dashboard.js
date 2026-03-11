@@ -1,5 +1,14 @@
 // js/dashboard.js
+console.log('[DEBUG] dashboard.js starting...');
+
+// Global error handler
+window.onerror = function(msg, url, lineNo, columnNo, error) {
+  console.error('[DEBUG] Global error:', msg, 'at line', lineNo);
+  return false;
+};
+
 const API = 'http://localhost:5000/api'; // ← change to deployed URL when live
+console.log('[DEBUG] API URL:', API);
 
 // ── Auth guard ─────────────────────────────────────────
 const token = localStorage.getItem('sa_token');
@@ -111,13 +120,17 @@ async function loadSites() {
 
 // ── Add site ───────────────────────────────────────────
 async function addSite() {
+  console.log('[DEBUG] addSite() called');
   const url      = document.getElementById('new-url').value.trim();
   const interval = document.getElementById('new-interval').value.trim();
   const errEl    = document.getElementById('add-error');
   errEl.textContent = '';
 
+  console.log('[DEBUG] URL:', url, 'Interval:', interval);
+
   if (!url || !interval) {
     errEl.textContent = 'Both URL and interval are required.';
+    console.log('[DEBUG] Validation failed: missing URL or interval');
     return;
   }
 
@@ -151,7 +164,7 @@ async function addSite() {
 // ── Toggle pause/resume ────────────────────────────────
 async function toggleSite(id) {
   try {
-    const res  = await authFetch(`${API}/sites/${id}`, { method: 'PATCH' });
+    const res  = await authFetch(`${API}/sites/${id}/toggle`, { method: 'PUT' });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
     showToast(data.site.is_active ? 'Site resumed.' : 'Site paused.');
@@ -178,3 +191,5 @@ async function deleteSite(id) {
 // ── Auto-refresh stats every 30s ──────────────────────
 loadSites();
 setInterval(loadSites, 30000);
+
+console.log('[DEBUG] dashboard.js loaded successfully');
