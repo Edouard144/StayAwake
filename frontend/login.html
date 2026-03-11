@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Log In — StayAwake</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<div class="auth-wrap">
+
+  <!-- Left decorative panel -->
+  <div class="auth-panel">
+    <div class="auth-panel-logo">
+      <span class="nav-logo-dot"></span>
+      StayAwake
+    </div>
+
+    <div class="auth-panel-body">
+      <p class="auth-panel-eyebrow">Welcome back</p>
+      <h2 class="auth-panel-heading">
+        Your sites have been<br>
+        <em>running all night.</em>
+      </h2>
+      <p class="auth-panel-sub">
+        While you were away, StayAwake kept pinging your sites on schedule.
+        Log in to check the status, add new sites, or make changes.
+      </p>
+    </div>
+
+    <div class="auth-panel-stats">
+      <div>
+        <div class="auth-stat-val">24 / 7</div>
+        <div class="auth-stat-lbl">Uptime monitoring</div>
+      </div>
+      <div>
+        <div class="auth-stat-val">1 min</div>
+        <div class="auth-stat-lbl">Minimum interval</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right form panel -->
+  <div class="auth-form-side">
+    <div class="auth-card">
+      <h1 class="auth-card-title">Welcome back</h1>
+      <p class="auth-card-sub">Log in to manage your sites.</p>
+
+      <form onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label">Email address</label>
+          <input class="form-input" type="email" id="email" placeholder="you@example.com" required/>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input" type="password" id="password" placeholder="Your password" required/>
+        </div>
+
+        <p class="form-error" id="login-error"></p>
+
+        <button type="submit" class="btn btn-gold btn-full" id="login-btn">
+          Log In →
+        </button>
+      </form>
+
+      <p class="auth-footer">
+        No account yet? <a href="register.html">Sign up free</a>
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/auth.js"></script>
+<script>redirectIfLoggedIn();</script>
+</body>
+</html>
