@@ -1,0 +1,7 @@
+# Never push these to GitHub
+node_modules/
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
