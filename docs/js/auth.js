@@ -1,5 +1,5 @@
 // js/auth.js
-const API = 'http://localhost:5000/api'; // ← change to deployed URL when live
+const API = 'https://stayawake.onrender.com/api'; // ← deployed URL
 
 function showError(id, msg) {
   const el = document.getElementById(id);
