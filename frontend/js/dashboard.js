@@ -7,7 +7,6 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
   return false;
 };
 
-var API = 'http://localhost:5000/api'; // ← change to deployed URL when live
 console.log('[DEBUG] API URL:', API);
 
 // ── Auth guard ─────────────────────────────────────────
