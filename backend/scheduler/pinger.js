@@ -4,21 +4,25 @@
 // and pings them. Works even when no user is on the website.
 
 const cron  = require('node-cron');
-const fetch = require('node-fetch');
+// Removed node-fetch import - using built-in fetch in Node 22
 const pool  = require('../config/db');
 
 // ── The ping function ──────────────────────────────────
 // Sends an HTTP GET to a URL and returns the status code
 const pingURL = async (url) => {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
     const response = await fetch(url, {
       method: 'GET',
-      // Timeout after 10 seconds — don't hang forever on dead sites
-      timeout: 10000
+      signal: controller.signal
     });
+
+    clearTimeout(timeoutId);
     return response.status; // e.g. 200, 404, 503
   } catch (err) {
-    // Network error, DNS fail, server completely down
+    // Network error, DNS fail, server completely down, or timeout
     console.error(`  ✗ Failed to ping ${url}:`, err.message);
     return null; // null = unreachable
   }
