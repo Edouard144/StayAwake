@@ -1,13 +1,12 @@
 // index.js
 // Entry point — starts the Express server and the pinger scheduler
-
+const startPinger = require('./scheduler/pinger');
 const express    = require('express');
 const cors       = require('cors');
 require('dotenv').config(); // load .env variables
 
 const authRoutes = require('./routes/authRoutes');
 const siteRoutes = require('./routes/siteRoutes');
-const startPinger = require('./scheduler/pinger');
 
 const app  = express();
 const PORT = process.env.PORT || 5000;

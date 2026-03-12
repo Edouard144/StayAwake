@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Create Account — StayAwake</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<div class="auth-wrap">
+
+  <!-- Left decorative panel -->
+  <div class="auth-panel">
+    <div class="auth-panel-logo">
+      <span class="nav-logo-dot"></span>
+      StayAwake
+    </div>
+
+    <div class="auth-panel-body">
+      <p class="auth-panel-eyebrow">Zero cold starts</p>
+      <h2 class="auth-panel-heading">
+        Your site is always<br>
+        <em>ready to impress.</em>
+      </h2>
+      <p class="auth-panel-sub">
+        Free-tier servers sleep. Investors, clients, and teammates don't wait.
+        StayAwake keeps your project live — every minute, without you lifting a finger.
+      </p>
+    </div>
+
+    <div class="auth-panel-stats">
+      <div>
+        <div class="auth-stat-val">100%</div>
+        <div class="auth-stat-lbl">Free to use</div>
+      </div>
+      <div>
+        <div class="auth-stat-val">&lt; 30s</div>
+        <div class="auth-stat-lbl">Setup time</div>
+      </div>
+      <div>
+        <div class="auth-stat-val">∞</div>
+        <div class="auth-stat-lbl">Sites monitored</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right form panel -->
+  <div class="auth-form-side">
+    <div class="auth-card">
+      <h1 class="auth-card-title">Create account</h1>
+      <p class="auth-card-sub">Start keeping your sites awake in under 30 seconds.</p>
+
+      <form onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label class="form-label">Email address</label>
+          <input class="form-input" type="email" id="email" placeholder="you@example.com" required/>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input" type="password" id="password" placeholder="Minimum 6 characters" required/>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Confirm password</label>
+          <input class="form-input" type="password" id="confirm" placeholder="Repeat your password" required/>
+        </div>
+
+        <p class="form-error" id="reg-error"></p>
+
+        <button type="submit" class="btn btn-gold btn-full" id="reg-btn">
+          Create Account →
+        </button>
+      </form>
+
+      <p class="auth-footer">
+        Already have an account? <a href="login.html">Log in</a>
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/auth.js"></script>
+<script>redirectIfLoggedIn();</script>
+</body>
+</html>

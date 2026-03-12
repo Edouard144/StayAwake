@@ -1,79 +1,74 @@
-// scheduler/pinger.js
-// node-cron scheduler that pings all active sites every 5 minutes
-// This keeps free-tier sites alive by preventing them from going idle
+// scheduler/pinger.js — FIXED VERSION
+// This is the ENGINE of StayAwake.
+// It runs every 1 minute, checks the DB for sites that are due to be pinged,
+// and pings them. Works even when no user is on the website.
 
-const cron = require('node-cron');
-const pool = require('../config/db');
+const cron  = require('node-cron');
+const fetch = require('node-fetch');
+const pool  = require('../config/db');
 
-// Use node-fetch v2 syntax
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-
-// Ping a single URL
-const pingUrl = async (url) => {
+// ── The ping function ──────────────────────────────────
+// Sends an HTTP GET to a URL and returns the status code
+const pingURL = async (url) => {
   try {
     const response = await fetch(url, {
       method: 'GET',
-      headers: {
-        'User-Agent': 'StayAwake/1.0 (Keep-alive service)'
-      },
-      timeout: 10000 // 10 second timeout
+      // Timeout after 10 seconds — don't hang forever on dead sites
+      timeout: 10000
     });
-    return response.ok;
+    return response.status; // e.g. 200, 404, 503
   } catch (err) {
-    console.error(`Ping failed for ${url}:`, err.message);
-    return false;
+    // Network error, DNS fail, server completely down
+    console.error(`  ✗ Failed to ping ${url}:`, err.message);
+    return null; // null = unreachable
   }
 };
 
-// Main ping function - fetches all active sites and pings them
-const pingAllSites = async () => {
-  console.log(`[${new Date().toISOString()}] Starting scheduled ping...`);
-  
-  try {
-    // Get all active sites
-    const result = await pool.query(
-      'SELECT id, url, name FROM sites WHERE active = true'
-    );
+// ── Main scheduler ────────────────────────────────────
+// Runs every 1 minute — '* * * * *' is cron syntax for "every minute"
+const startPinger = () => {
+  console.log('🕐 Pinger scheduler started — checking every minute');
 
-    const sites = result.rows;
-    console.log(`Found ${sites.length} active sites to ping`);
+  cron.schedule('* * * * *', async () => {
+    try {
+      // Fetch all ACTIVE sites from the database
+      const { rows: sites } = await pool.query(
+        'SELECT * FROM sites WHERE is_active = true'
+      );
 
-    // Ping each site
-    for (const site of sites) {
-      const success = await pingUrl(site.url);
-      
-      if (success) {
-        // Update last_pinged timestamp
-        await pool.query(
-          'UPDATE sites SET last_pinged = NOW() WHERE id = $1',
-          [site.id]
-        );
-        console.log(`✓ Pinged: ${site.name} (${site.url})`);
-      } else {
-        console.error(`✗ Failed: ${site.name} (${site.url})`);
+      if (sites.length === 0) return; // nothing to ping
+
+      const now = new Date();
+
+      for (const site of sites) {
+        // Calculate when this site was last pinged
+        const lastPinged  = site.last_pinged ? new Date(site.last_pinged) : null;
+        const intervalMs  = site.interval_min * 60 * 1000; // convert minutes → ms
+
+        // Check if enough time has passed since last ping
+        const isDue = !lastPinged || (now - lastPinged) >= intervalMs;
+
+        if (isDue) {
+          console.log(`🔔 Pinging [${site.id}] ${site.url}`);
+
+          const status = await pingURL(site.url);
+
+          // Update last_pinged and last_status in the DB
+          await pool.query(
+            `UPDATE sites
+             SET last_pinged = NOW(), last_status = $1
+             WHERE id = $2`,
+            [status, site.id]
+          );
+
+          console.log(`  ${status === 200 ? '✅' : '⚠️'} Status: ${status ?? 'unreachable'}`);
+        }
       }
+
+    } catch (err) {
+      console.error('Pinger error:', err.message);
     }
-
-    console.log(`[${new Date().toISOString()}] Scheduled ping complete`);
-  } catch (err) {
-    console.error('Error in scheduled ping:', err.message);
-  }
-};
-
-// Schedule the pinger to run every 5 minutes
-// Cron expression: every 5 minutes
-const startScheduler = () => {
-  console.log('Starting StayAwake pinger scheduler...');
-  
-  // Run immediately on startup, then every 5 minutes
-  pingAllSites();
-  
-  // Schedule to run every 5 minutes
-  cron.schedule('*/5 * * * *', () => {
-    pingAllSites();
   });
-
-  console.log('Pinger scheduler running (every 5 minutes)');
 };
 
-module.exports = { startScheduler, pingAllSites };
+module.exports = startPinger;
